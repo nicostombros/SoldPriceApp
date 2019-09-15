@@ -27,3 +27,7 @@ when using version control systems like GitHub. Other constraints included
 programming language: Python was used mainly for fast development.
 This allowed more time to focus on building a user-friendly front-end,
 since this interface is the one that users would be interacting with.
+
+THE FINAL PRODUCT
+
+You can have a little play around with the final app which is deployed on Python anywhere at the URL "http://nicostombros.pythonanywhere.com/"
