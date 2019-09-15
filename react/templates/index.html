@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+    <meta charset='utf-8'/>
+    <title>Sold Price Map</title>
+    <meta name='keywords' content='Student,Accommodation,Property,University,Reviews,Real Estate,Letting Agent'>
+    <meta name='viewport' content='width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta property='og:type' content='website'/>
+    <meta property='og:site_name' content='Acomorate'/>
+    <link href="https://fonts.googleapis.com/css?family=Merriweather:400,700i&display=swap" rel="stylesheet">
+    <style>
+      *{padding:0;margin:0}body{background-color:#2F4382}.f{display:flex}.f-c-c{justify-content:center;
+      align-items:center}
+      .f-sb{justify-content:space-between}.pad{padding:12px;box-sizing:border-box}
+      .pad-l{padding:24px;box-sizing:border-box}.max{width:100%}.max-h{height:100%}
+      .marg-t-s{margin-top:20px}.marg-t-l{margin-top:50px}.tac{text-align:center}.marg-b-x{margin-bottom:10px}
+      .w-bg{background:#FFF !important}.f-col{flex-direction:column}input{border:0;border-radius:6px;
+      font-size:16px;font-family:'Merriweather'}.f-ac{align-items:center}a{color:#BACBFF;text-decoration:none}
+      .b-w-btn{background:#4268DD;color:#FFF}.marg-l-x{margin-left:10px}.none{display:none}
+      .tc-b{color:#000}.r-s{border-radius:8px}.r-l{border-radius:18px}.abs{position:absolute}
+      .checkbox-input{display:flex;justify-content:center;align-items:center}
+      .checkbox-input-sub{cursor:pointer;width:16px;height:16px;background:transparent;border:2px solid;top:0;left:0;border-radius:3px}
+      .checkbox-input input[type='checkbox']:checked+.checkbox-input-sub:after{opacity:1}
+      .theme-p{border-color:#6B42DD}.checkbox-input input[type='checkbox']:checked+.theme-p{background:#6B42DD;border-color:#6B42DD}
+      .theme-b{border-color:#4288DD}.checkbox-input input[type='checkbox']:checked+.theme-b{background:#4288DD;border-color:#4288DD}
+      .theme-g{border-color:#42DD64}.checkbox-input input[type='checkbox']:checked+.theme-g{background:#42DD64;border-color:#42DD64}
+      .theme-y{border-color:#DDC342}.checkbox-input input[type='checkbox']:checked+.theme-y{background:#DDC342;border-color:#DDC342}
+      .theme-r{border-color:#DD4F42}.checkbox-input input[type='checkbox']:checked+.theme-r{background:#DD4F42;border-color:#DD4F42}
+      .theme-p-fill{background:#6B42DD}.theme-b-fill{background:#4288DD}.theme-g-fill{background:#42DD64}
+      .theme-y-fill{background:#DDC342}.theme-r-fill{background:#DD4F42}
+      .pop-up{position:absolute;margin-top:20px;background:#333;border-radius:4px;color:#FFF;pointer-events:none}
+      .bl-bg:hover{background:#E8EEFF}
+    </style>
+    {% load humanize %}
+  </head>
+  <body>
+    <div class='f ws max max-h'>
+      <div class='max max-h pad-l ws' style='max-width:300px'>
+        <div class='max max-h r-l w-bg'>
+          <div class='pad'>
+            <div class='pad-l'>
+              <h2>Sold Price Map</h2>
+              <h5>A demo tool that shows different prices of sold houses on a 100x100 grid.</h5>
+            </div>
+          </div>
+          <div class='f max f-col pad-l marg-b-x'>
+            {% for i in price_ranges %}
+            <label class='max'>
+              <div class='f max pad bl-bg r-s'>
+                <div class='checkbox-input'>
+                  <input class='checkbox-el none' type='checkbox' name='' value='{{ i.index }}' data-color='theme-{{ i.color }}-fill' checked required/>
+                  <div class='checkbox-input-sub theme-{{ i.color }}'></div>
+                </div>
+                <h4 class='marg-l-x'>{{ i.range }}</h4>
+              </div>
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <div class='max max-h pad-l'>
+        <div class='max max-h r-l w-bg'>
+          <div class='pad pad-l'>
+            <div class='pad'>
+              <h2>{{ results.total|intcomma }} Properties Sold</h2>
+              <h5>With a minimum sold price at £{{ results.min|intcomma }} and a maximum of £{{ results.max|intcomma }}</h5>
+              <h5>Hover over a point to see its price and coordinates.</h5>
+              <div class='max marg-t-s' id='grid'>
+                {% load custom_filters %}
+                <div class='max'>
+                  {% for ind,vals in data.items %}
+                  <div class='f max ws f-o'>
+                    {% for ind2,vals2 in vals.items %}
+                    <div class='max sub-grid'>
+                      <div class='sub-grid-el f ws f-o show-pop-up {% if vals2 %}theme-{{ vals2.color }}-fill{% endif %}' style='height:100%;min-height:5px;min-width:5px'>
+                      </div>
+                      <div class='pop-up pad marg-t-l none'>
+                        <h6 class='tac'>{% if vals2 %}Price of £{{ vals2.price|intcomma }}{% else %}No Data{% endif %} at ({{ ind }}, {{ ind2 }})</h6>
+                      </div>
+                    </div>
+                    {% endfor %}
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
+    <script>
+      var grid = document.getElementById('grid');
+      console.log(grid)
+      var width = grid.offsetWidth;
+      grid.style.height = width;
+      $('.show-pop-up').mouseover(function(){
+        $('.pop-up').addClass('none');
+        var p = $(this).parent().find('.pop-up');
+        p.removeClass('none');
+      });
+      $('.checkbox-el').on('change',function(){
+        var c = $(this).attr('data-color');
+        $('.' + c).toggleClass('w-bg');
+      });
+    </script>
+  </body>
+</html>
